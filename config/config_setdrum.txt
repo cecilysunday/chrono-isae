@@ -5,12 +5,12 @@ proj_container drum
 proj_units mm-g-s
 
 ## Material properties shared by all bodies
-youngs 7.0E5
+youngs 7.0E7
 poisson 0.24
-mu_pp 0.16
+mu_pp 0.40
 mu_pw 0.45
 mu_roll 0.09
-mu_spin 0.0
+mu_spin 0.01
 cor_pp 0.9
 cor_pw 0.5
 ad 0

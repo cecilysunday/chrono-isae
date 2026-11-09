@@ -5,26 +5,26 @@ proj_container cyl
 proj_units mm-g-s
 
 ## Material properties shared by all bodies
-youngs 7.0E5
+youngs 7.0E7
 poisson 0.24
-mu_pp 0.16
+mu_pp 0.40
 mu_pw 0.45
 mu_roll 0.09
-mu_spin 0.0
+mu_spin 0.01
 cor_pp 0.9
 cor_pw 0.5
 ad 0.0
 
 ## Geometric properties of the container
-clength_x 150.0
-clength_y 150.0
-clength_z 100.0
+clength_x 500.0
+clength_y 500.0
+clength_z 200.0
 cthickness 10.0
 cmass 1.0E3
 
 ## Geometric properties of the granular surface material
-gdia 10.0
-gmarg 0.5
+gdia 3.0
+gmarg 0.1
 grho 2.48E-3
 gvel 1.0E3
 
@@ -32,10 +32,10 @@ gvel 1.0E3
 grav_x 0.0
 grav_y 0.0
 grav_z -9.81E3
-time_step 1.0E-5
-time_loop 1.0E-3
+time_step 5.0E-6
+time_loop 1.0E-4
 time_save 0.1
-sim_duration 0.5
+sim_duration 1.0
 
 ## Simulation solver and collision detection parameters
 force_model hertz
