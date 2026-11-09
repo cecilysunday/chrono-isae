@@ -1,15 +1,15 @@
 
 ## Project information
 proj_setdir D:\c.sunday\Documents\Chrono\00_data\setcyl\220610_093521
-proj_type penetrometer
+proj_type runimpact
 proj_container cyl
-proj_intruder cyl
+proj_intruder sph
 proj_units mm-g-s
 
 ## Geometric properties of the intruder
 ilength_x 100.0
 ilength_y 100.0
-ilength_z 50.0
+ilength_z 100.0
 imass 1.0E3
-ivel 100.0
+ivel 1.0E3
 iwvel 0.0

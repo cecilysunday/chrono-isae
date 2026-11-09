@@ -378,7 +378,7 @@ int ComputeDerivedStuctValues(ConfigParameters* config, const std::string& dates
 		else config->ilength_r = config->ilength_x / 2.0;
 	}
 
-	// Determine the radius of a spherical container
+	// Determine the radius of a spherical intruder
 	if (config->proj_intruder == "sph") {
 		if (config->ilength_x != config->ilength_y || config->ilength_x != config->ilength_z) {
 			fprintf(stderr, "\nERR: For a spherical intruder, ilength_x must equal ilength_y and ilength_z in the configuration file.\n");
