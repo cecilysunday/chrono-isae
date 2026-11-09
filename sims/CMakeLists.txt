@@ -15,6 +15,7 @@ SET(TESTS
   benchmark
   impact
   penetrometer
+  rundrum
   setbox
   setcyl
   setdrum
