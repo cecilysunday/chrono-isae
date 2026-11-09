@@ -427,8 +427,9 @@ int main(int argc, char* argv[]) {
 	}
 
 	// Update the soft run-time parameters
-	double sim_duration = time + 3.0 * CH_C_2PI / std::abs(drum_wvel);
+	double sim_duration = time + 5.0 * CH_C_2PI / std::abs(drum_wvel);
 	double time_save = time + cp.time_save;
+	double time_max = time + 5.0;
 
 	GetLog() << "Sim duration (three drum rotations): " << sim_duration << " s\n";
 
@@ -463,6 +464,9 @@ int main(int argc, char* argv[]) {
 
 		// Calculate the average kinetic energy of all particles
 		bool printKE = CalcAverageKE(msystem, cp.proj_path, mstats.num_particles, glist.first, time, 1);
+	
+		// Break out of the loop if the max duration is exceeded
+		if (time > time_max) break;
 	}
 
 	// Export the final state data for all bodies in the system

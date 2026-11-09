@@ -231,10 +231,10 @@ int ConvertBinToCsv(const std::string& path) {
 	vector<std::string> file_list = GetFileList(path, true);
 
 	// Revise the file list to convert only the essential files
-	if (file_list.size() > 3) {
-		vector<std::string> temp_list = { *file_list.begin(), *(file_list.end() - 2), *(file_list.end() - 1) };
-		file_list = temp_list;
-	}
+	// if (file_list.size() > 3) {
+	//  vector<std::string> temp_list = { *file_list.begin(), *(file_list.end() - 2), *(file_list.end() - 1) };
+	//	file_list = temp_list;
+	//}
 
 	// Link the file extension types to the data structure type
 	std::string bin_ext = ".bin";
