@@ -361,6 +361,13 @@ int ComputeDerivedStuctValues(ConfigParameters* config, const std::string& dates
 		}
 		else config->clength_r = config->clength_x / 2.0;
 	}
+	else if (config->proj_container == "drum") {
+		if (config->clength_x != config->clength_z) {
+			fprintf(stderr, "\nERR: For a drum container, clength_x must equal clength_z in the configuration file.\n");
+			return -1;
+		}
+		else config->clength_r = config->clength_x / 2.0;
+	}
 
 	// Determine the radius of a cylindrical intruder
 	if (config->proj_intruder == "cyl") {
@@ -394,7 +401,7 @@ int MapParameters(ConfigParameters& config, const std::vector<std::string>& pars
 		 if (config.proj_type == "NA") config.proj_type = val;
 	}
 	else if (param == "proj_container") {
-		if (val != "box" && val != "cyl") {
+		if (val != "box" && val != "cyl" && val != "drum") {
 			fprintf(stderr, "\nERR: The configuration file contains an invalid container geometry! Container must be a box or a cyl.\n");
 			return -1;
 		}

@@ -1,0 +1,42 @@
+
+## Project information
+proj_type setdrum
+proj_container drum
+proj_units mm-g-s
+
+## Material properties shared by all bodies
+youngs 7.0E5
+poisson 0.24
+mu_pp 0.16
+mu_pw 0.45
+mu_roll 0.09
+mu_spin 0.0
+cor_pp 0.9
+cor_pw 0.5
+ad 0
+
+## Geometric properties of the container
+clength_x 80.0
+clength_y 20.0
+clength_z 80.0
+cthickness 5.0
+cmass 1.0E3
+
+## Geometric properties of the granular surface material
+gdia 1.0
+gmarg 0.1
+grho 2.5E-3
+gvel 1.0E3
+
+## Simulation run-time parameters
+grav_x 0.0
+grav_y 0.0
+grav_z -9.81E3
+time_step 5.0E-6
+time_loop 1.0E-4
+time_save 0.1
+sim_duration 1.0
+
+## Simulation solver and collision detection parameters
+force_model hertz
+adhesion_model perko

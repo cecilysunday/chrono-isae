@@ -17,6 +17,7 @@ SET(TESTS
   penetrometer
   setbox
   setcyl
+  setdrum
   )
 
 #--------------------------------------------------------------
