@@ -524,6 +524,8 @@ int InitializeSimulation(ConfigParameters* config, const std::string &cfile) {
 	if (config->proj_setdir != "NA") {
 		std::string sfile = config->proj_setdir + "/config_set.txt";
 		if (ImportConfigFile(config, sfile) != 0) return -2;
+		if (ImportConfigFile(config, cfile) != 0) return -1;
+		GetLog() << "Attention: possible overwrite of simulation parameters during re-import. \n";
 	}
 	
 	// Set the correct name in the ConfigParameters struct for the original configuration file

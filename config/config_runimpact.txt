@@ -13,3 +13,10 @@ ilength_z 100.0
 imass 1.0E3
 ivel 1.0E3
 iwvel 0.0
+
+## Simulation run-time parameters
+grav_x 0.0
+grav_y 0.0
+grav_z -9.81E3
+time_save 0.1
+sim_duration 1.0

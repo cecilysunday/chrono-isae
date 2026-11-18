@@ -4,3 +4,6 @@ proj_setdir /scratch/p19030sc/data/setdrum/YYMMDD_HHMMSS
 proj_type rundrum
 proj_container drum
 proj_units mm-g-s
+
+## Simulation run-time parameters
+time_save 0.1
