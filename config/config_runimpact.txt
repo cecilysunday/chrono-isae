@@ -1,6 +1,6 @@
 
 ## Project information
-proj_setdir D:\c.sunday\Documents\Chrono\00_data\setcyl\220610_093521
+proj_setdir /scratch/p19030sc/data/setcyl/YYMMDD_HHMMSS
 proj_type runimpact
 proj_container cyl
 proj_intruder sph
@@ -18,5 +18,5 @@ iwvel 0.0
 grav_x 0.0
 grav_y 0.0
 grav_z -9.81E3
-time_save 0.1
+time_save 0.01
 sim_duration 1.0

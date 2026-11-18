@@ -35,7 +35,7 @@ grav_z -9.81E3
 time_step 5.0E-6
 time_loop 1.0E-4
 time_save 0.1
-sim_duration 1.0
+sim_duration 0.5
 
 ## Simulation solver and collision detection parameters
 force_model hertz

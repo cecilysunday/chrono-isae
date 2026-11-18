@@ -1,6 +1,6 @@
 
 ## Project information
-proj_setdir D:\c.sunday\Documents\Chrono\00_data\setcyl\220610_093521
+proj_setdir /scratch/p19030sc/data/setcyl/YYMMDD_HHMMSS
 proj_type runpenetrometer
 proj_container cyl
 proj_intruder cyl

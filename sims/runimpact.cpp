@@ -407,7 +407,7 @@ int main(int argc, char* argv[]) {
 	double time_loop = cp.time_loop;
 
 	// LOOP 1: Iterate through the simulation for the first time to let the particles re-settle
-	while (time < 0.1) { // cp.sim_duration
+	while (time < 0.25) { // cp.sim_duration
 		// Start irrlicht visualization scene
 		#ifdef CHRONO_IRRLICHT
 		application->BeginScene();
