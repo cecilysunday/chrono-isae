@@ -123,7 +123,7 @@ std::pair<size_t, size_t> FillDrum(ChSystemMulticoreSMC* msystem, const ConfigPa
 	glist.first = msystem->Get_bodylist().size();
 
 	// Create an absolute air-gap margin value and determine the margin radius of each particle
-	double marg = std::max(0.25, 1.25 * cp.gmarg);
+	double gap = std::max(0.25, 1.25 * cp.gmarg);
 	double margrad = cp.grad + gap / 2.0;
 
 	// Outer ring of the particle cloud, with margin
