@@ -1,0 +1,13 @@
+
+## Project information
+proj_setdir D:\c.sunday\Documents\Chrono\00_data\setcyl\220610_093521
+proj_type resetcyl
+proj_container cyl
+proj_units mm-g-s
+
+## Simulation run-time parameters
+grav_x 0.0
+grav_y 0.0
+grav_z -9.81E3
+time_save 0.1
+sim_duration 1.0

@@ -13,6 +13,7 @@ cmake_minimum_required(VERSION 3.1)
 
 SET(TESTS
   benchmark
+  resetcyl
   rundrum
   runimpact
   runpenetrometer
