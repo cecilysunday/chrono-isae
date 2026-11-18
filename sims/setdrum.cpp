@@ -122,9 +122,9 @@ std::pair<size_t, size_t> FillDrum(ChSystemMulticoreSMC* msystem, const ConfigPa
 	std::pair<size_t, size_t> glist;
 	glist.first = msystem->Get_bodylist().size();
 
-	// Create a air-gap margin value and determine the margin radius of each particle
-	double marg = cp.gmarg * 2.5;
-	double margrad = cp.grad * (1.0 + marg);
+	// Create an absolute air-gap margin value and determine the margin radius of each particle
+	double marg = std::max(0.25, 1.25 * cp.gmarg);
+	double margrad = cp.grad + gap / 2.0;
 
 	// Outer ring of the particle cloud, with margin
 	double orad = drum.crad - 2.0 * margrad;
@@ -144,7 +144,7 @@ std::pair<size_t, size_t> FillDrum(ChSystemMulticoreSMC* msystem, const ConfigPa
 	// Create a generator for computing random sphere radius values that follow a normal distribution
 	auto seed = std::chrono::system_clock::now().time_since_epoch().count();
 	std::default_random_engine generator((unsigned int)seed);
-	std::normal_distribution<double> distribution(cp.grad, cp.gmarg / 4.0);
+	std::normal_distribution<double> distribution(cp.grad, cp.gmarg / 6.0);
 
 	// Construct a particle cloud in the bottom of the drum, starting from the front (+y) face of the drum
 	ChVector<> pos_ref = ChVector<>(0.0, drum.ciw / 2.0 - margrad, -orad);
@@ -163,7 +163,7 @@ std::pair<size_t, size_t> FillDrum(ChSystemMulticoreSMC* msystem, const ConfigPa
 			AddSphere(id++, msystem, cp, distribution(generator), posi, ChRandomXYZ(cp.gvel));
 
 			// Add particles to the left and right of the first particle until the drum limits are reached
-			double xlim = Sqrt(Pow(orad, 2.0) - Pow(posz - marg - orad, 2.0));
+			double xlim = Sqrt(Pow(orad, 2.0) - Pow(posz - gap / 2. - orad, 2.0));
 			for (int ix = 1; ix < numx; ++ix) {
 				ChVector<> posr = posi + ChVector<>(2.0 * sft_xz * ix, 0, 0);
 				ChVector<> posl = posi - ChVector<>(2.0 * sft_xz * ix, 0, 0);

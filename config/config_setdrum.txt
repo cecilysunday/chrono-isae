@@ -23,8 +23,8 @@ cthickness 5.0
 cmass 1.0E3
 
 ## Geometric properties of the granular surface material
-gdia 1.0
-gmarg 0.1
+gdia 1.1
+gmarg 0.15
 grho 2.5E-3
 gvel 1.0E3
 
