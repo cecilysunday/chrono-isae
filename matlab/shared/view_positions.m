@@ -55,15 +55,32 @@ T = tiledlayout(F, 2, 2, 'TileSpacing','compact', 'Padding','compact');
 
 % Panel 1 Top left: grain size distribution
 ax = nexttile(T, 1);
-histogram(ax, d, 'Normalization','percentage', 'FaceColor', C(1,:), ...
+hold(ax, 'on');
+H = histogram(ax, d, 'Normalization','percentage', 'FaceColor', C(1,:), ...
     'FaceAlpha', 1, 'EdgeColor', 'w', 'LineWidth', 0.5);
+
+% Fitted normal distribution, scaled to match the percentage histogram
+mu  = mean(d);
+sig = std(d);
+if sig > 0
+    xf = linspace(min(mu - 4*sig, min(d)), max(mu + 4*sig, max(d)), 300);
+    yf = 100 * H.BinWidth * exp(-0.5*((xf - mu)/sig).^2) / (sig*sqrt(2*pi));
+    plot(ax, xf, yf, 'k-', 'LineWidth', 1);
+end
+
 xlabel(ax, 'Grain diameter (mm)');
 ylabel(ax, 'Grains (%)');
 title(ax, 'Size distribution');
-ylim(ax, [0, 1.25*max(ylim(ax))]);
+ylim(ax, [0, 1.6*max(ylim(ax))]);
 pbaspect(ax, [1 1 1]);
 text(ax, 0.04, 0.96, sprintf('N = %s grains', format_count(numel(r))), ...
     'Units','normalized', 'VerticalAlignment','top');
+text(ax, 0.96, 0.96, { ...
+    sprintf('\\mu = %.3g mm', mu), ...
+    sprintf('\\sigma = %.3g mm', sig), ...
+    sprintf('min = %.3g mm', min(d)), ...
+    sprintf('max = %.3g mm', max(d))}, ...
+    'Units','normalized', 'VerticalAlignment','top', 'HorizontalAlignment','right');
 
 % Other views {tile, title, viewing axis, horizontal axis, vertical axis}
 views = {2, 'Top view',   3, 1, 2;      % along z: x right, y up

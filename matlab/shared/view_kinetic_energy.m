@@ -3,7 +3,7 @@
 %                                   the evolution of the energy in the system
 % INPUTS    dpath                   Data file path (contains system_energy.txt)
 %           rpath (optional)        Filepath to results folder. If given, the
-%                                   figure is saved there as a PNG and FIG
+%                                   figure is saved there as a PNG
 % OUTPUTS   F                       Figure handle
 %
 % NOTES     - Assumes the mm-g-s unit system
