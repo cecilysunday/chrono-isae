@@ -7,7 +7,7 @@ close all
 addpath(fullfile('..','shared'));
 
 % Input parameters
-dpath = 'C:\Users\c.sunday\Desktop\simulation_data\setdrum\261109_095348';
+dpath = '/home/deos/c.sunday/Bureau/data/setdrum/261118_185002';
 
 % Create a directory for the results
 rpath = fullfile(dpath,'results');
@@ -27,7 +27,7 @@ lastfile = fullfile(listbin(end).folder,listbin(end).name);
 [dat,count] = import_state_bin(lastfile);
 
 % View the system layout and particle size distribution
-view_positions(dat,rpath);
+view_positions(dat,rpath,'VelocityRange',[0.001 1.0]);
 
 % View the evolution of kinetic energy in the system
 view_kinetic_energy(dpath,rpath);
