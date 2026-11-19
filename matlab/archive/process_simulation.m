@@ -3,10 +3,10 @@ clear all
 close all
 
 % Path to utility functions for importing and plotting simulation data
-addpath('D:\c.sunday\Documents\Chrono\04_project_source\isae-sims\matlab\_util');
+addpath(fullfile('.','_util'));
 
 % Specify the data directory containing the simulation files to process
-dpath = 'D:\c.sunday\Documents\Chrono\00_data\cyl\set\220608_101705';
+dpath = 'C:\Users\c.sunday\Desktop\simulation_data\setdrum\261109_095348';
 
 % Import standard simulation files into matlab as data tables
 energy = import_energy(dpath);
