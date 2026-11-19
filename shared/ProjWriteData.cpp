@@ -171,15 +171,15 @@ int ImportStateBin(ParticleData* data, const std::string &fname) {
 int WriteCsvHeader(const std::string &fname) {
 	if (!filesystem::path(fname).exists()) {
 		std::ofstream csv_out(fname);
-		csv_out << "body_id, time, radius, collision_map,"
-				<< "pos_x, pos_y, pos_z,"
-				<< "rot_0, rot_1, rot_2, rot_3,"
-				<< "vel_x, vel_y, vel_z,"
-				<< "rot_vel_x, rot_vel_y, rot_vel_z,"
-				<< "acc_x, acc_y, acc_z,"
-				<< "rot_acc_x, rot_acc_y, rot_acc_z,"
-				<< "force_x, force_y, force_z,"
-				<< "torque_x, torque_y, torque_z\n";
+		csv_out << "body_id,time,radius,collision_map,"
+				<< "pos_x,pos_y,pos_z,"
+				<< "rot_0,rot_1,rot_2,rot_3,"
+				<< "vel_x,vel_y,vel_z,"
+				<< "rot_vel_x,rot_vel_y,rot_vel_z,"
+				<< "acc_x,acc_y,acc_z,"
+				<< "rot_acc_x,rot_acc_y,rot_acc_z,"
+				<< "force_x,force_y,force_z,"
+				<< "torque_x,torque_y,torque_z\n";
 		csv_out.close();
 	}
 

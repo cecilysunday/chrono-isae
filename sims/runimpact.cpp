@@ -481,9 +481,9 @@ int main(int argc, char* argv[]) {
 			return -1;
 		}
 
-		// Save and write data every (cp.time_save / time_step) steps (particles only, not walls)
+		// Save and write data every (cp.time_save / time_step) steps (particles only and walls, for Esteban)
 		if (time > time_save) {
-			if (ArchiveState(msystem, mstats, cp.proj_path, mstats.num_particles, glist.first, time) != 0) {
+			if (ArchiveState(msystem, mstats, cp.proj_path, mstats.num_bodies, wlist.first, time) != 0) {
 				fprintf(stderr, "\nERR: Error archiving run-time data \n");
 				return -1;
 			}
