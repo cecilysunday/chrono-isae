@@ -116,15 +116,47 @@ void AddSphere(int id, ChSystemMulticoreSMC* msystem, const ConfigParameters& cp
 }
 
 
-std::pair<size_t, size_t> FillDrum(ChSystemMulticoreSMC* msystem, const ConfigParameters& cp, const DrumGeometry& drum) {
+// Target packing fraction of the initial particle cloud (before settling)
+const double FILL_PHI = 0.40;
+
+// Standard deviation of the grain radius distribution used in FillDrum
+double GrainRadiusStdDev(const ConfigParameters& cp) { return cp.gmarg / 6.0; }
+
+
+int CalcMarginRadius(double* margrad, const ConfigParameters& cp, double phi) {
+	// The particle cloud is an FCC/HCP lattice with center-to-center spacing d = 2 * margrad, which has
+	// packing fraction phi = (pi / (3 * sqrt(2))) * (2 * r / d)^3 * k, where k = <r^3> / r^3 = 1 + 3 * (sig / r)^2
+	// corrects for the spread in grain size. Invert this to find the spacing for the target packing fraction.
+	double sig = GrainRadiusStdDev(cp);
+	double k = 1.0 + 3.0 * Pow(sig / cp.grad, 2.0);
+	double phi_fcc = CH_C_PI / (3.0 * sqrt(2.0));
+	*margrad = cp.grad * std::cbrt(phi_fcc * k / phi);
+
+	// The largest grains (r + 3 * sig) must not overlap their neighbors when the cloud is created
+	double rmax = cp.grad + 3.0 * sig;
+	if (*margrad < rmax) {
+		double phi_max = phi_fcc * k * Pow(cp.grad / rmax, 3.0);
+		fprintf(stderr, "\nERR: Target packing fraction %.3f is too high for grains of diameter %.3f +/- %.3f. "
+			"The largest grains would overlap at creation. Maximum packing fraction for these grains is %.3f.\n",
+			phi, cp.gdia, cp.gmarg, phi_max);
+		return -1;
+	}
+
+	return 0;
+}
+
+
+int FillDrum(std::pair<size_t, size_t>* glist, ChSystemMulticoreSMC* msystem, const ConfigParameters& cp, const DrumGeometry& drum) {
+	// Calculate the particle cloud spacing from the target packing fraction
+	double margrad;
+	if (CalcMarginRadius(&margrad, cp, FILL_PHI) != 0) return -1;
+
 	// Get start index of particle list
 	int id = 0;
-	std::pair<size_t, size_t> glist;
-	glist.first = msystem->Get_bodylist().size();
+	glist->first = msystem->Get_bodylist().size();
 
-	// Create an absolute air-gap margin value and determine the margin radius of each particle
-	double gap = std::max(0.25, 1.25 * cp.gmarg);
-	double margrad = cp.grad + gap / 2.0;
+	// Air gap between the surfaces of neighboring nominal-size grains
+	double gap = 2.0 * (margrad - cp.grad);
 
 	// Outer ring of the particle cloud, with margin
 	double orad = drum.crad - 2.0 * margrad;
@@ -144,7 +176,7 @@ std::pair<size_t, size_t> FillDrum(ChSystemMulticoreSMC* msystem, const ConfigPa
 	// Create a generator for computing random sphere radius values that follow a normal distribution
 	auto seed = std::chrono::system_clock::now().time_since_epoch().count();
 	std::default_random_engine generator((unsigned int)seed);
-	std::normal_distribution<double> distribution(cp.grad, cp.gmarg / 6.0);
+	std::normal_distribution<double> distribution(cp.grad, GrainRadiusStdDev(cp));
 
 	// Construct a particle cloud in the bottom of the drum, starting from the front (+y) face of the drum
 	ChVector<> pos_ref = ChVector<>(0.0, drum.ciw / 2.0 - margrad, -orad);
@@ -176,8 +208,8 @@ std::pair<size_t, size_t> FillDrum(ChSystemMulticoreSMC* msystem, const ConfigPa
 	}
 
 	// Get the end index of the particle list and return
-	glist.second = msystem->Get_bodylist().size() - 1;
-	return glist;
+	glist->second = msystem->Get_bodylist().size() - 1;
+	return 0;
 }
 
 
@@ -309,7 +341,11 @@ int main(int argc, char* argv[]) {
 
 	// Add the drum and grains to the simulation. The drum is fixed for the 'set' sim.
 	std::pair<size_t, size_t> wlist = AddDrum(&msystem, cp, drum);
-	std::pair<size_t, size_t> glist = FillDrum(&msystem, cp, drum);
+	std::pair<size_t, size_t> glist;
+	if (FillDrum(&glist, &msystem, cp, drum) != 0) {
+		fprintf(stderr, "\nERR: Error filling the drum with grains\n");
+		return -1;
+	}
 
 	// Create an object to track certain system info and stats
 	SystemData mstats;
