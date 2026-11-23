@@ -27,7 +27,12 @@ lastfile = fullfile(listbin(end).folder,listbin(end).name);
 [dat,count] = import_state_bin(lastfile);
 
 % View the system layout and particle size distribution
-view_positions(dat,rpath,'VelocityRange',[1 10]);
+% Cylinder: diameter = clength_x = clength_y, height = clength_z, axis
+% along z, floor at z = 0
+container = struct('shape','cylinder','diameter',500,'height',200, ...
+    'orientation','z','center',[0 0 100]);
+view_static(dat,container,rpath);
+view_dynamic(dat,container,rpath,'vel_m',[1 10]);
 
 % View the evolution of kinetic energy in the system
 view_kinetic_energy(dpath,rpath);

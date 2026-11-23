@@ -4,7 +4,7 @@
 % OUTPUTS   listbin         List of all binary files in the directory
 %           listcsv         List of all csv files in the directory
 %
-% NOTES     - Exclude intruder files. Only consider grain state files
+% NOTES     - Exclude intruder files. Only consider grain state files.
 % -------------------------------------------------------------------------
 function [listbin, listcsv] = get_data_list(dpath)
 

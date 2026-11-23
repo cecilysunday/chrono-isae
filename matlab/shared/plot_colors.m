@@ -6,10 +6,10 @@
 %                           same fixed order (blue, orange, aqua, yellow,
 %                           magenta, green, violet, red). Assign them in
 %                           order -- series 1 gets C(1,:), etc.
-%           P               Struct of neutral colors:
-%                             P.ink    primary text / axes
-%                             P.ink2   secondary text / annotations
-%                             P.gray   reference lines, fills
+%           P               Structure of neutral colors:
+%                           P.ink    primary text / axes
+%                           P.ink2   secondary text / annotations
+%                           P.gray   reference lines, fills
 %
 % NOTES     - The first 3 colors stay distinguishable for colorblind
 %             readers in any arrangement (scatter, overlapping lines).
