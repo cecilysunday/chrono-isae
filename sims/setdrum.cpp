@@ -126,13 +126,13 @@ double GrainRadiusStdDev(const ConfigParameters& cp) { return cp.gmarg / 6.0; }
 int CalcMarginRadius(double* margrad, const ConfigParameters& cp, double phi) {
 	// The particle cloud is an FCC/HCP lattice with center-to-center spacing d = 2 * margrad, which has
 	// packing fraction phi = (pi / (3 * sqrt(2))) * (2 * r / d)^3 * k, where k = <r^3> / r^3 = 1 + 3 * (sig / r)^2
-	// corrects for the spread in grain size. Invert this to find the spacing for the target packing fraction.
+	// corrects for the spread in grain size.
 	double sig = GrainRadiusStdDev(cp);
 	double k = 1.0 + 3.0 * Pow(sig / cp.grad, 2.0);
 	double phi_fcc = CH_C_PI / (3.0 * sqrt(2.0));
 	*margrad = cp.grad * std::cbrt(phi_fcc * k / phi);
 
-	// The largest grains (r + 3 * sig) must not overlap their neighbors when the cloud is created
+	// The largest grains (r + 3 * sig) must not overlap with their neighbors when the cloud is created
 	double rmax = cp.grad + 3.0 * sig;
 	if (*margrad < rmax) {
 		double phi_max = phi_fcc * k * Pow(cp.grad / rmax, 3.0);
