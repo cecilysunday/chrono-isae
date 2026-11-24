@@ -11,6 +11,8 @@
 %           - Slices are sorted largest first, starting at 12 o'clock
 %           - Slices below 3% are not labelled on the pie; their share is
 %             still listed in the legend
+%           - The total computation time (h) is timer_total_sim, or the sum
+%             of the timers if the file does not have it
 % -------------------------------------------------------------------------
 function [F] = view_timers(dpath,rpath)
 
@@ -77,8 +79,16 @@ entries = cellfun(@(s, p) sprintf('%s (%.1f%%)', s, p), labels, num2cell(pct), .
     'UniformOutput', false);
 legend(ax, slices, entries, 'Location', 'eastoutside', 'Box', 'off');
 
+% Total computation time: the simulation timer if present, else the sum
+if ismember('timer_total_sim', S.Properties.VariableNames)
+    ttot = S.timer_total_sim;
+else
+    ttot = sum(timers);
+end
+
 title(ax, 'Computation time by function');
 text(ax, 0.5, -0.06, { ...
+    sprintf('Total computation time: %.1f h', ttot / 3600), ...
     sprintf('Particles: %s   |   Shapes: %s', ...
         format_count(S.num_particles), format_count(S.num_shapes)), ...
     sprintf('CPU time: %.3g s per time step per shape', S.sim_cpu)}, ...

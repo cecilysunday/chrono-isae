@@ -20,6 +20,11 @@
 %                               at each end before fitting, to leave out
 %                               the curved surface near the drum wall.
 %                               Default: 0.15
+%           'Labels'            true (default): print the angles on
+%                               figure 1. false: leave them off (e.g. for
+%                               the frames of an animation)
+%           'DepthPlot'         true (default): make (and save) figure 2.
+%                               false: skip it; S.F(2) is then empty
 % OUTPUTS   theta               Mean angle of repose over all slices (deg)
 %           err                 Standard error of that mean (deg):
 %                               std(slice angles) / sqrt(number of slices)
@@ -59,6 +64,8 @@ arguments
     opts.SliceThickness (1,1) double = NaN
     opts.Resolution (1,1) double = NaN
     opts.Trim (1,1) double {mustBeInRange(opts.Trim, 0, 0.49)} = 0.15
+    opts.Labels (1,1) logical = true
+    opts.DepthPlot (1,1) logical = true
 end
 
 % Grains only
@@ -121,6 +128,7 @@ blue  = light + 0.5*(C(1,:) - light);     % same grain color as view_static
 red   = C(8,:);                           % same red as view_dynamic
 
 % Figure 1: front view of the middle slice
+F = gobjects(1, 2);
 F(1) = figure('Name','angle_of_repose','Units','centimeters','Position',[2 2 12 12]);
 ax = axes(F(1));
 in = abs(P(:,2) - yc(kmid)) <= t/2;
@@ -131,36 +139,40 @@ xl = [min(xs), max(xs)] + [-1 1]*0.1*(max(xs) - min(xs));
 plot3(ax, xl, fm.m*xl + fm.b, (ztop + 1)*[1 1], 'k-', 'LineWidth', 1.5);
 title(ax, 'Angle of repose');
 subtitle(ax, sprintf('Slice y = %.3g \\pm %.2g mm', yc(kmid), t/2));
-text(ax, 0.03, 0.97, { ...
-    sprintf('\\theta = %.1f\\circ \\pm %.1f\\circ with %s surface grains', fm.theta, fm.err,format_count(fm.n)), ...
-    sprintf('\\theta_{%d} = %.1f\\circ \\pm %.1f\\circ', nnz(ok), theta, err)}, ...
-    'Units','normalized', 'VerticalAlignment','top', ...
-    'BackgroundColor','w', 'Margin', 2);
+if opts.Labels
+    text(ax, 0.03, 0.97, { ...
+        sprintf('\\theta = %.1f\\circ \\pm %.1f\\circ with %s surface grains', fm.theta, fm.err,format_count(fm.n)), ...
+        sprintf('\\theta_{%d} = %.1f\\circ \\pm %.1f\\circ', nnz(ok), theta, err)}, ...
+        'Units','normalized', 'VerticalAlignment','top', ...
+        'BackgroundColor','w', 'Margin', 2);
+end
 plot_format(F(1));
 
 % Figure 2: angle versus depth
-F(2) = figure('Name','angle_of_repose_depth','Units','centimeters','Position',[2 2 14 9]);
-ax = axes(F(2));
-hold(ax, 'on');
-xr = [ylo yhi] + [-1 1]*0.05*(yhi - ylo);
-patch(ax, xr([1 2 2 1]), theta + err*[-1 -1 1 1], Pn.gray, ...
-    'FaceAlpha', 0.25, 'EdgeColor', 'none');
-plot(ax, xr, theta*[1 1], '-', 'Color', Pn.ink2, 'LineWidth', 1);
-errorbar(ax, yc(ok), th(ok), se(ok), 'o', 'Color', C(1,:), ...
-    'MarkerFaceColor', C(1,:), 'MarkerSize', 5, 'LineWidth', 1, 'CapSize', 4);
-yl = ylim(ax);
-yl = yl + [-1 1]*0.15*diff(yl);
-plot(ax, ylo*[1 1], yl, 'k-', 'LineWidth', 1.5);     % end walls
-plot(ax, yhi*[1 1], yl, 'k-', 'LineWidth', 1.5);
-xlim(ax, xr);
-ylim(ax, yl);
-xlabel(ax, 'y (mm)');
-ylabel(ax, 'Angle of repose (\circ)');
-title(ax, 'Angle of repose across the depth');
-text(ax, 0.5, 0.96, sprintf('Mean = %.1f\\circ \\pm %.1f\\circ (%d slices, %.2g mm thick)', ...
-    theta, err, nnz(ok), t), 'Units','normalized', ...
-    'HorizontalAlignment','center', 'VerticalAlignment','top');
-plot_format(F(2));
+if opts.DepthPlot
+    F(2) = figure('Name','angle_of_repose_depth','Units','centimeters','Position',[2 2 14 9]);
+    ax = axes(F(2));
+    hold(ax, 'on');
+    xr = [ylo yhi] + [-1 1]*0.05*(yhi - ylo);
+    patch(ax, xr([1 2 2 1]), theta + err*[-1 -1 1 1], Pn.gray, ...
+        'FaceAlpha', 0.25, 'EdgeColor', 'none');
+    plot(ax, xr, theta*[1 1], '-', 'Color', Pn.ink2, 'LineWidth', 1);
+    errorbar(ax, yc(ok), th(ok), se(ok), 'o', 'Color', C(1,:), ...
+        'MarkerFaceColor', C(1,:), 'MarkerSize', 5, 'LineWidth', 1, 'CapSize', 4);
+    yl = ylim(ax);
+    yl = yl + [-1 1]*0.15*diff(yl);
+    plot(ax, ylo*[1 1], yl, 'k-', 'LineWidth', 1.5);     % end walls
+    plot(ax, yhi*[1 1], yl, 'k-', 'LineWidth', 1.5);
+    xlim(ax, xr);
+    ylim(ax, yl);
+    xlabel(ax, 'y (mm)');
+    ylabel(ax, 'Angle of repose (\circ)');
+    title(ax, 'Angle of repose across the depth');
+    text(ax, 0.5, 0.96, sprintf('Mean = %.1f\\circ \\pm %.1f\\circ (%d slices, %.2g mm thick)', ...
+        theta, err, nnz(ok), t), 'Units','normalized', ...
+        'HorizontalAlignment','center', 'VerticalAlignment','top');
+    plot_format(F(2));
+end
 
 % Save plots
 if ~isempty(rpath)
@@ -168,7 +180,9 @@ if ~isempty(rpath)
         mkdir(rpath);
     end
     exportgraphics(F(1), fullfile(rpath,'angle_of_repose.png'), 'Resolution', 300, 'Padding', 'figure');
-    exportgraphics(F(2), fullfile(rpath,'angle_of_repose_depth.png'), 'Resolution', 300, 'Padding', 'figure');
+    if opts.DepthPlot
+        exportgraphics(F(2), fullfile(rpath,'angle_of_repose_depth.png'), 'Resolution', 300, 'Padding', 'figure');
+    end
 end
 
 mid = struct('y', yc(kmid), 'slope', fm.m, 'intercept', fm.b, 'surface', g(fm.idx));
@@ -196,8 +210,9 @@ idx = find(P(:,2) + r >= ylim(1) & P(:,2) - r <= ylim(2));
 if numel(idx) < 3, return; end
 Q = P(idx,:);
 
-% Visible grains whose centers lie in the slice
-isurf = surface_grains(Q, r(idx), ds, ylim);
+% Grains visible from above (sample points only inside the slice), then
+% those whose centers lie in the slice
+isurf = visible_grains(Q(:,1), Q(:,2), Q(:,3), r(idx), ds, 'VRange', ylim);
 isurf = isurf(Q(isurf,2) >= ylim(1) & Q(isurf,2) <= ylim(2));
 if numel(isurf) < 3, return; end
 
@@ -223,49 +238,6 @@ res  = z - (m*x + b);
 se_m = sqrt(sum(res.^2) / max(n - 2, 1) / sum((x - mean(x)).^2));
 f = struct('theta', atand(abs(m)), 'err', rad2deg(se_m / (1 + m^2)), ...
     'm', m, 'b', b, 'idx', idx(isurf), 'n', n);
-end
-
-% -------------------------------------------------------------------------
-% Grains visible from above (indices into Q). Sample points on a square
-% x-y grid with spacing ds, only where ylim(1) <= y <= ylim(2); at each
-% point, the surface grain is the one whose top is highest right above
-% it: z + sqrt(r^2 - d^2), d = distance from the grain center. A grain
-% covers many points, so each is kept once.
-% -------------------------------------------------------------------------
-function isurf = surface_grains(Q, r, ds, ylim)
-
-N  = size(Q,1);
-x0 = min(Q(:,1) - r);
-y0 = min(Q(:,2) - r);
-
-% Offsets of the sample points around each grain's nearest point, wide
-% enough to cover the largest grain
-m = ceil(max(r)/ds) + 1;
-[ox, oy] = meshgrid(-m:m);
-ox = ox(:)';  oy = oy(:)';                % 1 x K
-
-% Sample point indices and positions for every grain (N x K)
-bx = round((Q(:,1) - x0)/ds);
-by = round((Q(:,2) - y0)/ds);
-ix = bx + ox;
-iy = by + oy;
-dx = x0 + ix*ds - Q(:,1);
-dy = y0 + iy*ds - Q(:,2);
-d2 = dx.^2 + dy.^2;
-ys = y0 + iy*ds;                          % sample point y
-in = d2 <= r.^2 & ys >= ylim(1) & ys <= ylim(2);   % points under the grain
-
-% Height of each grain's top at each covered point
-h  = Q(:,3) + sqrt(max(r.^2 - d2, 0));
-gi = repmat((1:N)', 1, numel(ox));
-key = (ix(in) + m) * (max(iy(:)) + 2*m + 2) + (iy(in) + m);
-
-% Highest grain at each sample point, then unique grains
-[~, order] = sortrows([key, -h(in)]);
-first = [true; diff(key(order)) ~= 0];
-g = gi(in);
-isurf = unique(g(order(first)));
-
 end
 
 % -------------------------------------------------------------------------

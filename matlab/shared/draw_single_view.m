@@ -11,16 +11,36 @@
 %                               (1 = x, 2 = y, 3 = z)
 %           s                   Side of the viewer along the viewing axis
 %                               (+1 or -1)
+% OPTS      'Cull'              true (default): draw only the grains that
+%                               can be seen from the viewer (see
+%                               visible_grains), which is much faster for
+%                               large beds. false: draw all grains
 % OUTPUTS   ztop                Depth just above all grains and the
 %                               outline; draw anything at a larger depth
 %                               to put it on top
 %
 % NOTES     - Grains are drawn as circles at their true radius. The depth
 %             buffer shows only the grains visible from that side
+%           - Culling samples the view on a grid with spacing of half the
+%             smallest grain radius, so only slivers far below a pixel can
+%             be lost
 %           - A cylinder is drawn as a circle when viewed along its axis
 %             and as a rectangle otherwise
 % -------------------------------------------------------------------------
-function ztop = draw_single_view(ax, P, r, geo, col, a, h, v, s)
+function ztop = draw_single_view(ax, P, r, geo, col, a, h, v, s, opts)
+
+arguments
+    ax
+    P
+    r
+    geo
+    col
+    a
+    h
+    v
+    s
+    opts.Cull (1,1) logical = true
+end
 
 names = 'xyz';
 cyl   = geo.cyl;
@@ -28,6 +48,11 @@ hold(ax, 'on');
 
 % Grains as true-size circles. Depth = distance toward the viewer.
 depth = s * P(:,a);
+if opts.Cull && ~isempty(depth)
+    k = visible_grains(P(:,h), P(:,v), depth, r, min(r)/4);
+    P = P(k,:);  r = r(k);  depth = depth(k);
+    if ~isequal(size(col), [1 3]), col = col(k,:); end
+end
 if ~isempty(depth)                        % e.g. an empty slice
     draw_circles(ax, P(:,h), P(:,v), depth, r, col);
 end

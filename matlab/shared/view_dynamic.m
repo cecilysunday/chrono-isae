@@ -38,9 +38,24 @@
 %                               "front". Default: all three
 %           'SliceThickness'    Slab thickness (mm). Default: 2 mean grain
 %                               diameters
+%           'HistEdges'         Bin edges of the histogram, which also set
+%                               its x range. Default: [] (from the data,
+%                               see plot_value_hist)
+%           'HistYMax'          Top of the histogram's y axis (%). Default:
+%                               NaN (2.3 x the tallest bar). It is raised
+%                               if a bar would not fit, so no bar is cut off
 % OUTPUTS   F                   Figure handle
+%           cs                  Color scale used: struct with .range
+%                               ([min max]), .scale ('log' or 'linear'),
+%                               and the histogram's .hist_edges and
+%                               .hist_ymax. Pass them back in to draw other
+%                               data sets on the same scales, e.g. for the
+%                               frames of an animation
 %
 % EXAMPLES  view_dynamic(dat,container,rpath,'vel_m',[0.001 1.0]);
+%           [~,cs] = view_dynamic(dat,container,'','vel_m');
+%           view_dynamic(dat2,container,'','vel_m',cs.range,'Scale',cs.scale, ...
+%               'HistEdges',cs.hist_edges,'HistYMax',cs.hist_ymax);
 %           view_dynamic(dat,container,rpath,'force_m');
 %           view_dynamic(dat,container,'','vel_z','Highlight',inf);
 %           view_dynamic(dat,container,rpath,'force_m','Colormap','rainbow');
@@ -59,7 +74,7 @@
 %           - With a log scale, values <= 0 get the bottom color
 %           - Assumes the mm-g-s unit system
 % -------------------------------------------------------------------------
-function [F] = view_dynamic(dat,container,rpath,field,range,opts)
+function [F, cs] = view_dynamic(dat,container,rpath,field,range,opts)
 
 arguments
     dat
@@ -74,6 +89,8 @@ arguments
     opts.Slice double = []
     opts.SliceViews string = ["top","side","front"]
     opts.SliceThickness (1,1) double = NaN
+    opts.HistEdges double = []
+    opts.HistYMax (1,1) double = NaN
 end
 field = char(field);
 
@@ -139,7 +156,8 @@ rgb(v > VHL, :) = repmat(red, nnz(v > VHL), 1);
 
 F = figure('Name',field,'Units','centimeters','Position',[2 2 19 17]);
 T = tiledlayout(F, 2, 2, 'TileSpacing','compact', 'Padding','compact');
-plot_value_hist(nexttile(T, 1), v, LIM, VHL, islog, short, unit, lbl, C(1,:), red);
+[hedges, hymax] = plot_value_hist(nexttile(T, 1), v, LIM, VHL, islog, short, unit, lbl, ...
+    C(1,:), red, opts.HistEdges(:)', opts.HistYMax);
 AX = draw_triple_view(T, P, r, get_container_geometry(container, P, r), rgb, ...
     'Slice', opts.Slice, 'SliceViews', opts.SliceViews, ...
     'SliceThickness', opts.SliceThickness);
@@ -174,6 +192,10 @@ if ~isempty(rpath)
     exportgraphics(F, fullfile(rpath, ['dynamic_' field '.png']), ...
         'Resolution', 300, 'Padding', 'figure');
 end
+
+scales = {'linear', 'log'};
+cs = struct('range', LIM, 'scale', scales{islog + 1}, ...
+    'hist_edges', hedges, 'hist_ymax', hymax);
 
 end
 
@@ -250,13 +272,23 @@ end
 % to the 99.5th percentile, widened to cover the color range. Values
 % outside the bins are counted in the end bins. The color range is shaded
 % in gray and values above the highlight threshold are stacked in red.
+% Given edges and ymax (not empty / NaN) are used instead; ymax is raised
+% if a bar would not fit. Returns the edges and the y-axis top used.
 % -------------------------------------------------------------------------
-function plot_value_hist(ax, v, lim, vhl, islog, name, unit, lbl, col, red)
+function [edges, ytop] = plot_value_hist(ax, v, lim, vhl, islog, name, unit, lbl, col, red, edges, ymax)
 
 [~, Pn] = plot_colors();
 hold(ax, 'on');
 
-if islog
+if ~isempty(edges)
+    if numel(edges) < 2 || any(diff(edges) <= 0) || (islog && edges(1) <= 0)
+        error('view_dynamic:badHistEdges', ...
+            'HistEdges must be increasing (and > 0 for a log scale).');
+    end
+    if islog                              % whole decades inside the edges
+        e = ceil(log10(edges(1)) - 1e-9) : floor(log10(edges(end)) + 1e-9);
+    end
+elseif islog
     vs = sort(v(v > 0));
     v01 = vs(max(1, ceil(0.01*numel(vs))));
     e   = floor(log10(min(v01, lim(1)))) : ceil(log10(max(vs(end), lim(2))));
@@ -274,6 +306,9 @@ cslow  = 100 * histcounts(vc(v <= vhl), edges) / numel(v);
 
 % Shaded color-scale range, behind the bars
 ytop = 2.3 * max(counts);
+if ~isnan(ymax)
+    ytop = max(ymax, 1.05 * max(counts));
+end
 patch(ax, lim([1 2 2 1]), [0 0 ytop ytop], Pn.gray, ...
     'FaceAlpha', 0.25, 'EdgeColor', 'none');
 
@@ -287,7 +322,7 @@ histogram(ax, 'BinEdges', edges, 'BinCounts', cslow, 'FaceColor', col, ...
 
 if islog
     ax.XScale = 'log';
-    xticks(ax, 10.^e);
+    if ~isempty(e), xticks(ax, 10.^e); end
 end
 xlim(ax, edges([1 end]));
 ylim(ax, [0 ytop]);

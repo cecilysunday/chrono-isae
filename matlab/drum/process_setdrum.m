@@ -39,5 +39,5 @@ lastfile = fullfile(listbin(end).folder,listbin(end).name);
 view_static(dat,container,rpath);
 
 % View the system layout with the grains colored by a third variable
-view_dynamic(dat,container,rpath,'vel_m',[0.001 1.0]);
+view_dynamic(dat,container,rpath,'vel_m');
 view_dynamic(dat,container,rpath,'force_m');

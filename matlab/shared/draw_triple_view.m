@@ -11,7 +11,7 @@
 %                               Default: [] (no slicing)
 %           'SliceViews'        Views to slice, any of "top", "side",
 %                               "front". Default: all three
-%           'SliceThickness'    Slab thickness (mm). Default: 2 mean grain
+%           'SliceThickness'    Slab thickness (mm). Default: 3 mean grain
 %                               diameters
 % OUTPUTS   AX                  The three axes [top, side, front]
 %
@@ -46,7 +46,7 @@ if dosl
     end
     t = opts.SliceThickness;
     if isnan(t)
-        t = 2 * mean(2*r);
+        t = 3 * mean(2*r);
     elseif t <= 0
         error('draw_triple_view:badThickness', 'SliceThickness must be positive.');
     end
