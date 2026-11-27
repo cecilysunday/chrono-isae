@@ -7,7 +7,11 @@ close all
 addpath(fullfile('..','shared'));
 
 % Input parameters
-dpath = 'C:\Users\c.sunday\Desktop\simulation_data\rundrum\261114_130705';
+dpath = 'C:\Users\c.sunday\Desktop\simulation_data\rundrum\261121_012032';
+
+% State files to process for the animations and the angle of repose over
+% time: 1 = every file, 2 = every other file, ...
+frame_step = 2;
 
 % Container dimensions
 container = struct('shape','cylinder','diameter',80,'height',20,'orientation','y');
@@ -31,22 +35,30 @@ if isempty(listbin)
     return;
 end
 
+% Import the first file in the data set
+firstfile = fullfile(listbin(1).folder,listbin(1).name);
+[dati,counti] = import_state_bin_fast(firstfile);
+
+% View the system layout and particle size distribution
+view_static(dati,container,rpath);
+
 % Import the last file in the data set
 lastfile = fullfile(listbin(end).folder,listbin(end).name);
-[dat,count] = import_state_bin_fast(lastfile);
+[datf,countf] = import_state_bin_fast(lastfile);
 
 % View the system layout with the grains colored by a third variable. The
 % color scale of this (final) data set is kept for the animation below.
 field = 'vel_m';
 dyn_opts = {'Colormap','rainbow','Slice',[0 0 0],'SliceViews',"front"};
-[~,cs] = view_dynamic(dat,container,rpath,field,dyn_opts{:});
+[~,cs] = view_dynamic(datf,container,rpath,field,dyn_opts{:});
 
 % Find the angle of repose from the free surface of the bed
-[theta,theta_err] = find_angle_of_repose(dat,container,rpath);
+[theta,theta_err] = find_angle_of_repose(datf,container,rpath);
 
-% Loop over all state files to extract frames for the animations and the angle of
-% repose over time. Skips state_final.bin
+% Loop over the state files (every frame_step-th one) to extract frames for
+% the animations and the angle of repose over time. Skips state_final.bin
 files = listbin(~strcmp({listbin.name}, 'state_final.bin'));
+files = files(1:frame_step:end);
 nf    = numel(files);
 fdyn  = fullfile(rpath,'frames_dynamic');
 faor  = fullfile(rpath,'frames_aor');
@@ -63,9 +75,16 @@ paor = strings(nf,1);
 vis = get(0,'DefaultFigureVisible');
 set(0,'DefaultFigureVisible','off');
 for k = 1:nf
-    fprintf('Frame %d of %d: %s\n', k, nf, files(k).name);
+    fprintf('File %d of %d: %s\n', k, nf, files(k).name);
     d = import_state_bin_fast(fullfile(files(k).folder,files(k).name));
     tt(k) = d.time(1);
+
+    % 2) angle of repose front view
+    [th(k),te(k),S] = find_angle_of_repose(d,container,'','Labels',false,'DepthPlot',false);
+    add_time_label(S.F(1), tt(k));
+    paor(k) = fullfile(faor, sprintf('frame_%03d.png', k));
+    exportgraphics(S.F(1), paor(k), 'Resolution', 300, 'Padding', 'figure');
+    close(S.F(1));
 
     % 1) view_dynamic on the color scale of the final data set
     F = view_dynamic(d,container,'',field,cs.range,'Scale',cs.scale,dyn_opts{:}, ...
@@ -74,13 +93,6 @@ for k = 1:nf
     pdyn(k) = fullfile(fdyn, sprintf('frame_%03d.png', k));
     exportgraphics(F, pdyn(k), 'Resolution', 300, 'Padding', 'figure');
     close(F);
-
-    % 2) angle of repose front view
-    [th(k),te(k),S] = find_angle_of_repose(d,container,'','Labels',false,'DepthPlot',false);
-    add_time_label(S.F(1), tt(k));
-    paor(k) = fullfile(faor, sprintf('frame_%03d.png', k));
-    exportgraphics(S.F(1), paor(k), 'Resolution', 300, 'Padding', 'figure');
-    close(S.F(1));
 end
 set(0,'DefaultFigureVisible',vis);
 

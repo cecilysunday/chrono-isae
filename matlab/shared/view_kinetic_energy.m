@@ -38,7 +38,7 @@ plot(ax1, ke.time, pos(ke.mean_KE_rot), 'LineWidth', lw);
 set(ax1, 'YScale', 'log');
 ylabel(ax1, 'Mean kinetic energy (nJ)');
 title(ax1, 'Kinetic energy');
-legend(ax1, {'Total','Translational','Rotational'},'Location','north','Orientation','horizontal');
+legend(ax1, {'Total','Translational','Rotational'},'Location','south','Orientation','horizontal');
 
 % Panel 2: particle velocity
 ax2 = nexttile(T);
@@ -49,7 +49,7 @@ set(ax2, 'YScale', 'log');
 ylabel(ax2, 'Velocity (mm/s)');
 xlabel(ax2, 'Time (s)');
 title(ax2, 'Particle velocity');
-legend(ax2, {'Maximum','RMS'}, 'Location','north','Orientation','horizontal');
+legend(ax2, {'Maximum','RMS'}, 'Location','south','Orientation','horizontal');
 
 % Formatting
 linkaxes([ax1 ax2],'x');
@@ -57,7 +57,7 @@ linkaxes([ax1 ax2],'x');
 xlim(ax1,[0 ke.time(end)]);
 ax1.XTickLabel = {};
 
-plot_format(F, 'DecadeTicks', true, 'DecadeHeadroom', 0);
+plot_format(F, 'DecadeTicks', true, 'DecadeHeadroom', 1);
 
 % Save plot
 if nargin > 1 && ~isempty(rpath)

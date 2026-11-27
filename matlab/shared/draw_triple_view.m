@@ -57,7 +57,7 @@ percol = ~isequal(size(col), [1 3]);
 % 'side' is where the viewer sits along the viewing axis (+1 or -1),
 % chosen so (horizontal, vertical, toward viewer) is right-handed
 views = {2, 'Top view',   "top",   3, 1, 2,  1;     % from +z: x right, y up
-         3, 'Side view',  "side",  1, 2, 3,  1;     % from +x: y right, z up
+         3, 'Side view',  "side",  1, 2, 3, -1;     % from -x: y right, z up
          4, 'Front view', "front", 2, 1, 3, -1};    % from -y: x right, z up
 names = 'xyz';
 
